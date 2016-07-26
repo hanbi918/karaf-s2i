@@ -13,7 +13,7 @@ Using s2i command:
 
 Using oc command:
 
-    oc new-app --strategy=source fabric8/s2i-karaf~https://github.com/chenyanxu/karaf-s2i.git --context-dir=karaf
+    oc new-app --strategy=source fabric8/s2i-karaf~https://github.com/chenyanxu/karaf-s2i.git --context-dir=karaf -p MAVEN_ARGS="install karaf:assembly karaf:archive -DskipTests -e -X"
 
 ## Configuring the Karaf4 or hawt-app assembly
 

@@ -1,4 +1,11 @@
 # fuse-s2i
+## 使用说明
+   该模块用于创建s2i的build镜像，直接运行build.sh，即可创建openshift/s2i-karaf镜像。
+   在创建成功后，运行以下命令：
+    oc whoami -t
+    docker tag openshift/s2i-karaf 172.30.93.175:5000/openshift/s2i-karaf 
+    docker push 172.30.93.175:5000/openshift/s2i-karaf
+    
 
 An image that can be used with Openshift's [Source To Image](https://docs.openshift.com/enterprise/3.0/creating_images/s2i.html) in order to build
 [Karaf4 custom assembly](https://karaf.apache.org/manual/latest/developers-guide/custom-distribution.html) or

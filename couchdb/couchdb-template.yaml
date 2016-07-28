@@ -1,0 +1,462 @@
+apiVersion: v1
+kind: Template
+metadata:
+  creationTimestamp: null
+  name: couchdb-template
+objects:
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    annotations:
+      openshift.io/generated-by: OpenShiftNewApp
+      openshift.io/image.dockerRepositoryCheck: 2016-07-28T07:39:05Z
+    creationTimestamp: null
+    generation: 2
+    labels:
+      name: couchdb
+    name: couchdb
+  spec:
+    tags:
+    - annotations:
+        openshift.io/imported-from: klaemo/couchdb
+      from:
+        kind: DockerImage
+        name: 172.30.93.175:5000/database/couchdb:latest
+      generation: 2
+      importPolicy: {}
+      name: latest
+  status:
+    dockerImageRepository: ""
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    annotations:
+      openshift.io/generated-by: OpenShiftNewApp
+    creationTimestamp: null
+    labels:
+      name: couchdb
+    name: couchdb
+  spec:
+    replicas: 1
+    selector:
+      deploymentconfig: couchdb
+      name: couchdb
+    strategy:
+      resources: {}
+      rollingParams:
+        intervalSeconds: 1
+        maxSurge: 25%
+        maxUnavailable: 25%
+        timeoutSeconds: 600
+        updatePeriodSeconds: 1
+      type: Rolling
+    template:
+      metadata:
+        annotations:
+          openshift.io/container.couchdb.image.entrypoint: '["tini","--","/docker-entrypoint.sh","couchdb"]'
+          openshift.io/generated-by: OpenShiftNewApp
+        creationTimestamp: null
+        labels:
+          deploymentconfig: couchdb
+          name: couchdb
+      spec:
+        containers:
+        - env:
+          - name: COUCHDB_PASSWORD
+            value: "123456"
+          - name: COUCHDB_USER
+            value: admin
+          image: 172.30.93.175:5000/openshift/couchdb@sha256:47743e89881bd03fbf0f0c986fc4eb32848a6fa290e3fe1e1a05414a75a137c7
+          imagePullPolicy: Always
+          name: couchdb
+          ports:
+          - containerPort: 5984
+            protocol: TCP
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          volumeMounts:
+          - mountPath: /usr/local/var/lib/couchdb
+            name: couchdb-volume-1
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - name: couchdb-volume-1
+          persistentVolumeClaim:
+            claimName: couchdb-claim
+    test: false
+    triggers:
+    - type: ConfigChange
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+        - couchdb
+        from:
+          kind: ImageStreamTag
+          name: couchdb:latest
+          namespace: openshift
+      type: ImageChange
+  status: {}
+- apiVersion: v1
+  kind: ReplicationController
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/desired-replicas: "1"
+      openshift.io/deployer-pod.name: couchdb-1-deploy
+      openshift.io/deployment-config.latest-version: "1"
+      openshift.io/deployment-config.name: couchdb
+      openshift.io/deployment.phase: Failed
+      openshift.io/deployment.replicas: "0"
+      openshift.io/encoded-deployment-config: |
+        {"kind":"DeploymentConfig","apiVersion":"v1","metadata":{"name":"couchdb","namespace":"database","selfLink":"/oapi/v1/namespaces/database/deploymentconfigs/couchdb","uid":"1dc40324-5498-11e6-927d-5cf3fcdceffc","resourceVersion":"251602","creationTimestamp":"2016-07-28T07:51:39Z","labels":{"name":"couchdb"},"annotations":{"openshift.io/generated-by":"OpenShiftNewApp"}},"spec":{"strategy":{"type":"Rolling","rollingParams":{"updatePeriodSeconds":1,"intervalSeconds":1,"timeoutSeconds":600,"maxUnavailable":"25%","maxSurge":"25%"},"resources":{}},"triggers":[{"type":"ConfigChange"},{"type":"ImageChange","imageChangeParams":{"automatic":true,"containerNames":["couchdb"],"from":{"kind":"ImageStreamTag","namespace":"openshift","name":"couchdb:latest"},"lastTriggeredImage":"172.30.93.175:5000/openshift/couchdb@sha256:47743e89881bd03fbf0f0c986fc4eb32848a6fa290e3fe1e1a05414a75a137c7"}}],"replicas":1,"test":false,"selector":{"deploymentconfig":"couchdb","name":"couchdb"},"template":{"metadata":{"creationTimestamp":null,"labels":{"deploymentconfig":"couchdb","name":"couchdb"},"annotations":{"openshift.io/container.couchdb.image.entrypoint":"[\"tini\",\"--\",\"/docker-entrypoint.sh\",\"couchdb\"]","openshift.io/generated-by":"OpenShiftNewApp"}},"spec":{"volumes":[{"name":"couchdb-volume-1","emptyDir":{}}],"containers":[{"name":"couchdb","image":"172.30.93.175:5000/openshift/couchdb@sha256:47743e89881bd03fbf0f0c986fc4eb32848a6fa290e3fe1e1a05414a75a137c7","ports":[{"containerPort":5984,"protocol":"TCP"}],"env":[{"name":"COUCHDB_PASSWORD","value":"123456"},{"name":"COUCHDB_USER","value":"admin"}],"resources":{},"volumeMounts":[{"name":"couchdb-volume-1","mountPath":"/usr/local/var/lib/couchdb"}],"terminationMessagePath":"/dev/termination-log","imagePullPolicy":"Always"}],"restartPolicy":"Always","terminationGracePeriodSeconds":30,"dnsPolicy":"ClusterFirst","securityContext":{}}}},"status":{"latestVersion":1,"details":{"causes":[{"type":"ConfigChange"}]}}}
+    creationTimestamp: null
+    generation: 1
+    labels:
+      name: couchdb
+      openshift.io/deployment-config.name: couchdb
+    name: couchdb-1
+  spec:
+    replicas: 0
+    selector:
+      deployment: couchdb-1
+      deploymentconfig: couchdb
+      name: couchdb
+    template:
+      metadata:
+        annotations:
+          openshift.io/container.couchdb.image.entrypoint: '["tini","--","/docker-entrypoint.sh","couchdb"]'
+          openshift.io/deployment-config.latest-version: "1"
+          openshift.io/deployment-config.name: couchdb
+          openshift.io/deployment.name: couchdb-1
+          openshift.io/generated-by: OpenShiftNewApp
+        creationTimestamp: null
+        labels:
+          deployment: couchdb-1
+          deploymentconfig: couchdb
+          name: couchdb
+      spec:
+        containers:
+        - env:
+          - name: COUCHDB_PASSWORD
+            value: "123456"
+          - name: COUCHDB_USER
+            value: admin
+          image: 172.30.93.175:5000/openshift/couchdb@sha256:47743e89881bd03fbf0f0c986fc4eb32848a6fa290e3fe1e1a05414a75a137c7
+          imagePullPolicy: Always
+          name: couchdb
+          ports:
+          - containerPort: 5984
+            protocol: TCP
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          volumeMounts:
+          - mountPath: /usr/local/var/lib/couchdb
+            name: couchdb-volume-1
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - emptyDir: {}
+          name: couchdb-volume-1
+  status:
+    replicas: 0
+- apiVersion: v1
+  kind: ReplicationController
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/original-replicas: "1"
+      openshift.io/deployer-pod.name: couchdb-2-deploy
+      openshift.io/deployment-config.latest-version: "2"
+      openshift.io/deployment-config.name: couchdb
+      openshift.io/deployment.phase: Complete
+      openshift.io/deployment.replicas: "0"
+      openshift.io/encoded-deployment-config: |
+        {"kind":"DeploymentConfig","apiVersion":"v1","metadata":{"name":"couchdb","namespace":"database","selfLink":"/oapi/v1/namespaces/database/deploymentconfigs/couchdb","uid":"1dc40324-5498-11e6-927d-5cf3fcdceffc","resourceVersion":"251645","creationTimestamp":"2016-07-28T07:51:39Z","labels":{"name":"couchdb"},"annotations":{"openshift.io/generated-by":"OpenShiftNewApp"}},"spec":{"strategy":{"type":"Rolling","rollingParams":{"updatePeriodSeconds":1,"intervalSeconds":1,"timeoutSeconds":600,"maxUnavailable":"25%","maxSurge":"25%"},"resources":{}},"triggers":[{"type":"ConfigChange"},{"type":"ImageChange","imageChangeParams":{"automatic":true,"containerNames":["couchdb"],"from":{"kind":"ImageStreamTag","namespace":"openshift","name":"couchdb:latest"},"lastTriggeredImage":"172.30.93.175:5000/openshift/couchdb@sha256:47743e89881bd03fbf0f0c986fc4eb32848a6fa290e3fe1e1a05414a75a137c7"}}],"replicas":1,"test":false,"selector":{"deploymentconfig":"couchdb","name":"couchdb"},"template":{"metadata":{"creationTimestamp":null,"labels":{"deploymentconfig":"couchdb","name":"couchdb"},"annotations":{"openshift.io/container.couchdb.image.entrypoint":"[\"tini\",\"--\",\"/docker-entrypoint.sh\",\"couchdb\"]","openshift.io/generated-by":"OpenShiftNewApp"}},"spec":{"volumes":[{"name":"couchdb-volume-1","emptyDir":{}}],"containers":[{"name":"couchdb","image":"172.30.93.175:5000/openshift/couchdb@sha256:47743e89881bd03fbf0f0c986fc4eb32848a6fa290e3fe1e1a05414a75a137c7","ports":[{"containerPort":5984,"protocol":"TCP"}],"env":[{"name":"COUCHDB_PASSWORD","value":"123456"},{"name":"COUCHDB_USER","value":"admin"}],"resources":{},"volumeMounts":[{"name":"couchdb-volume-1","mountPath":"/usr/local/var/lib/couchdb"}],"terminationMessagePath":"/dev/termination-log","imagePullPolicy":"Always"}],"restartPolicy":"Always","terminationGracePeriodSeconds":30,"dnsPolicy":"ClusterFirst","securityContext":{}}}},"status":{"latestVersion":2,"details":{"causes":[{"type":"ConfigChange"}]}}}
+    creationTimestamp: null
+    generation: 1
+    labels:
+      name: couchdb
+      openshift.io/deployment-config.name: couchdb
+    name: couchdb-2
+  spec:
+    replicas: 0
+    selector:
+      deployment: couchdb-2
+      deploymentconfig: couchdb
+      name: couchdb
+    template:
+      metadata:
+        annotations:
+          openshift.io/container.couchdb.image.entrypoint: '["tini","--","/docker-entrypoint.sh","couchdb"]'
+          openshift.io/deployment-config.latest-version: "2"
+          openshift.io/deployment-config.name: couchdb
+          openshift.io/deployment.name: couchdb-2
+          openshift.io/generated-by: OpenShiftNewApp
+        creationTimestamp: null
+        labels:
+          deployment: couchdb-2
+          deploymentconfig: couchdb
+          name: couchdb
+      spec:
+        containers:
+        - env:
+          - name: COUCHDB_PASSWORD
+            value: "123456"
+          - name: COUCHDB_USER
+            value: admin
+          image: 172.30.93.175:5000/openshift/couchdb@sha256:47743e89881bd03fbf0f0c986fc4eb32848a6fa290e3fe1e1a05414a75a137c7
+          imagePullPolicy: Always
+          name: couchdb
+          ports:
+          - containerPort: 5984
+            protocol: TCP
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          volumeMounts:
+          - mountPath: /usr/local/var/lib/couchdb
+            name: couchdb-volume-1
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - emptyDir: {}
+          name: couchdb-volume-1
+  status:
+    replicas: 0
+- apiVersion: v1
+  kind: ReplicationController
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/desired-replicas: "1"
+      kubectl.kubernetes.io/update-source-id: couchdb-2:6555b1f9-5498-11e6-927d-5cf3fcdceffc
+      openshift.io/deployer-pod.name: couchdb-3-deploy
+      openshift.io/deployment-config.latest-version: "3"
+      openshift.io/deployment-config.name: couchdb
+      openshift.io/deployment.phase: Failed
+      openshift.io/deployment.replicas: "0"
+      openshift.io/encoded-deployment-config: |
+        {"kind":"DeploymentConfig","apiVersion":"v1","metadata":{"name":"couchdb","namespace":"database","selfLink":"/oapi/v1/namespaces/database/deploymentconfigs/couchdb","uid":"1dc40324-5498-11e6-927d-5cf3fcdceffc","resourceVersion":"251831","creationTimestamp":"2016-07-28T07:51:39Z","labels":{"name":"couchdb"},"annotations":{"openshift.io/generated-by":"OpenShiftNewApp"}},"spec":{"strategy":{"type":"Rolling","rollingParams":{"updatePeriodSeconds":1,"intervalSeconds":1,"timeoutSeconds":600,"maxUnavailable":"25%","maxSurge":"25%"},"resources":{}},"triggers":[{"type":"ConfigChange"},{"type":"ImageChange","imageChangeParams":{"automatic":true,"containerNames":["couchdb"],"from":{"kind":"ImageStreamTag","namespace":"openshift","name":"couchdb:latest"},"lastTriggeredImage":"172.30.93.175:5000/openshift/couchdb@sha256:47743e89881bd03fbf0f0c986fc4eb32848a6fa290e3fe1e1a05414a75a137c7"}}],"replicas":1,"test":false,"selector":{"deploymentconfig":"couchdb","name":"couchdb"},"template":{"metadata":{"creationTimestamp":null,"labels":{"deploymentconfig":"couchdb","name":"couchdb"},"annotations":{"openshift.io/container.couchdb.image.entrypoint":"[\"tini\",\"--\",\"/docker-entrypoint.sh\",\"couchdb\"]","openshift.io/generated-by":"OpenShiftNewApp"}},"spec":{"volumes":[{"name":"couchdb-volume-1","persistentVolumeClaim":{"claimName":"couchdb-claim"}}],"containers":[{"name":"couchdb","image":"172.30.93.175:5000/openshift/couchdb@sha256:47743e89881bd03fbf0f0c986fc4eb32848a6fa290e3fe1e1a05414a75a137c7","ports":[{"containerPort":5984,"protocol":"TCP"}],"env":[{"name":"COUCHDB_PASSWORD","value":"123456"},{"name":"COUCHDB_USER","value":"admin"}],"resources":{},"volumeMounts":[{"name":"couchdb-volume-1","mountPath":"/usr/local/var/lib/couchdb"}],"terminationMessagePath":"/dev/termination-log","imagePullPolicy":"Always"}],"restartPolicy":"Always","terminationGracePeriodSeconds":30,"dnsPolicy":"ClusterFirst","securityContext":{}}}},"status":{"latestVersion":3,"details":{"causes":[{"type":"ConfigChange"}]}}}
+    creationTimestamp: null
+    generation: 1
+    labels:
+      name: couchdb
+      openshift.io/deployment-config.name: couchdb
+    name: couchdb-3
+  spec:
+    replicas: 0
+    selector:
+      deployment: couchdb-3
+      deploymentconfig: couchdb
+      name: couchdb
+    template:
+      metadata:
+        annotations:
+          openshift.io/container.couchdb.image.entrypoint: '["tini","--","/docker-entrypoint.sh","couchdb"]'
+          openshift.io/deployment-config.latest-version: "3"
+          openshift.io/deployment-config.name: couchdb
+          openshift.io/deployment.name: couchdb-3
+          openshift.io/generated-by: OpenShiftNewApp
+        creationTimestamp: null
+        labels:
+          deployment: couchdb-3
+          deploymentconfig: couchdb
+          name: couchdb
+      spec:
+        containers:
+        - env:
+          - name: COUCHDB_PASSWORD
+            value: "123456"
+          - name: COUCHDB_USER
+            value: admin
+          image: 172.30.93.175:5000/openshift/couchdb@sha256:47743e89881bd03fbf0f0c986fc4eb32848a6fa290e3fe1e1a05414a75a137c7
+          imagePullPolicy: Always
+          name: couchdb
+          ports:
+          - containerPort: 5984
+            protocol: TCP
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          volumeMounts:
+          - mountPath: /usr/local/var/lib/couchdb
+            name: couchdb-volume-1
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - name: couchdb-volume-1
+          persistentVolumeClaim:
+            claimName: couchdb-claim
+  status:
+    replicas: 0
+- apiVersion: v1
+  kind: ReplicationController
+  metadata:
+    annotations:
+      openshift.io/deployer-pod.name: couchdb-4-deploy
+      openshift.io/deployment-config.latest-version: "4"
+      openshift.io/deployment-config.name: couchdb
+      openshift.io/deployment.phase: Complete
+      openshift.io/deployment.replicas: "1"
+      openshift.io/encoded-deployment-config: |
+        {"kind":"DeploymentConfig","apiVersion":"v1","metadata":{"name":"couchdb","namespace":"database","selfLink":"/oapi/v1/namespaces/database/deploymentconfigs/couchdb","uid":"1dc40324-5498-11e6-927d-5cf3fcdceffc","resourceVersion":"252261","creationTimestamp":"2016-07-28T07:51:39Z","labels":{"name":"couchdb"},"annotations":{"openshift.io/generated-by":"OpenShiftNewApp"}},"spec":{"strategy":{"type":"Rolling","rollingParams":{"updatePeriodSeconds":1,"intervalSeconds":1,"timeoutSeconds":600,"maxUnavailable":"25%","maxSurge":"25%"},"resources":{}},"triggers":[{"type":"ConfigChange"},{"type":"ImageChange","imageChangeParams":{"automatic":true,"containerNames":["couchdb"],"from":{"kind":"ImageStreamTag","namespace":"openshift","name":"couchdb:latest"},"lastTriggeredImage":"172.30.93.175:5000/openshift/couchdb@sha256:47743e89881bd03fbf0f0c986fc4eb32848a6fa290e3fe1e1a05414a75a137c7"}}],"replicas":1,"test":false,"selector":{"deploymentconfig":"couchdb","name":"couchdb"},"template":{"metadata":{"creationTimestamp":null,"labels":{"deploymentconfig":"couchdb","name":"couchdb"},"annotations":{"openshift.io/container.couchdb.image.entrypoint":"[\"tini\",\"--\",\"/docker-entrypoint.sh\",\"couchdb\"]","openshift.io/generated-by":"OpenShiftNewApp"}},"spec":{"volumes":[{"name":"couchdb-volume-1","persistentVolumeClaim":{"claimName":"couchdb-claim"}}],"containers":[{"name":"couchdb","image":"172.30.93.175:5000/openshift/couchdb@sha256:47743e89881bd03fbf0f0c986fc4eb32848a6fa290e3fe1e1a05414a75a137c7","ports":[{"containerPort":5984,"protocol":"TCP"}],"env":[{"name":"COUCHDB_PASSWORD","value":"123456"},{"name":"COUCHDB_USER","value":"admin"}],"resources":{},"volumeMounts":[{"name":"couchdb-volume-1","mountPath":"/usr/local/var/lib/couchdb"}],"terminationMessagePath":"/dev/termination-log","imagePullPolicy":"Always"}],"restartPolicy":"Always","terminationGracePeriodSeconds":30,"dnsPolicy":"ClusterFirst","securityContext":{}}}},"status":{"latestVersion":4,"details":{"causes":[{"type":"ConfigChange"}]}}}
+    creationTimestamp: null
+    generation: 1
+    labels:
+      name: couchdb
+      openshift.io/deployment-config.name: couchdb
+    name: couchdb-4
+  spec:
+    replicas: 1
+    selector:
+      deployment: couchdb-4
+      deploymentconfig: couchdb
+      name: couchdb
+    template:
+      metadata:
+        annotations:
+          openshift.io/container.couchdb.image.entrypoint: '["tini","--","/docker-entrypoint.sh","couchdb"]'
+          openshift.io/deployment-config.latest-version: "4"
+          openshift.io/deployment-config.name: couchdb
+          openshift.io/deployment.name: couchdb-4
+          openshift.io/generated-by: OpenShiftNewApp
+        creationTimestamp: null
+        labels:
+          deployment: couchdb-4
+          deploymentconfig: couchdb
+          name: couchdb
+      spec:
+        containers:
+        - env:
+          - name: COUCHDB_PASSWORD
+            value: "123456"
+          - name: COUCHDB_USER
+            value: admin
+          image: 172.30.93.175:5000/openshift/couchdb@sha256:47743e89881bd03fbf0f0c986fc4eb32848a6fa290e3fe1e1a05414a75a137c7
+          imagePullPolicy: Always
+          name: couchdb
+          ports:
+          - containerPort: 5984
+            protocol: TCP
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          volumeMounts:
+          - mountPath: /usr/local/var/lib/couchdb
+            name: couchdb-volume-1
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - name: couchdb-volume-1
+          persistentVolumeClaim:
+            claimName: couchdb-claim
+  status:
+    replicas: 0
+- apiVersion: v1
+  kind: Route
+  metadata:
+    creationTimestamp: null
+    labels:
+      name: couchdb
+    name: couchdb
+  spec:
+    host: couchdb.apps.kalix.com
+    port:
+      targetPort: 5984-tcp
+    to:
+      kind: Service
+      name: couchdb
+  status:
+    ingress:
+    - conditions:
+      - lastTransitionTime: 2016-07-28T08:24:50Z
+        status: "True"
+        type: Admitted
+      host: couchdb.apps.kalix.com
+      routerName: router
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      openshift.io/generated-by: OpenShiftNewApp
+    creationTimestamp: null
+    labels:
+      name: couchdb
+    name: couchdb
+  spec:
+    ports:
+    - name: 5984-tcp
+      port: 5984
+      protocol: TCP
+      targetPort: 5984
+    selector:
+      deploymentconfig: couchdb
+      name: couchdb
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    annotations:
+      kubernetes.io/created-by: |
+        {"kind":"SerializedReference","apiVersion":"v1","reference":{"kind":"ReplicationController","namespace":"database","name":"couchdb-4","uid":"d0d0a8f9-549b-11e6-927d-5cf3fcdceffc","apiVersion":"v1","resourceVersion":"252277"}}
+      openshift.io/container.couchdb.image.entrypoint: '["tini","--","/docker-entrypoint.sh","couchdb"]'
+      openshift.io/deployment-config.latest-version: "4"
+      openshift.io/deployment-config.name: couchdb
+      openshift.io/deployment.name: couchdb-4
+      openshift.io/generated-by: OpenShiftNewApp
+      openshift.io/scc: fabric8-develop
+    creationTimestamp: null
+    generateName: couchdb-4-
+    labels:
+      deployment: couchdb-4
+      deploymentconfig: couchdb
+      name: couchdb
+  spec:
+    containers:
+    - env:
+      - name: COUCHDB_PASSWORD
+        value: "123456"
+      - name: COUCHDB_USER
+        value: admin
+      image: 172.30.93.175:5000/openshift/couchdb@sha256:47743e89881bd03fbf0f0c986fc4eb32848a6fa290e3fe1e1a05414a75a137c7
+      imagePullPolicy: Always
+      name: couchdb
+      ports:
+      - containerPort: 5984
+        protocol: TCP
+      resources: {}
+      securityContext:
+        privileged: false
+      terminationMessagePath: /dev/termination-log
+      volumeMounts:
+      - mountPath: /usr/local/var/lib/couchdb
+        name: couchdb-volume-1
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: default-token-9dyvr
+        readOnly: true
+    dnsPolicy: ClusterFirst
+    host: node1.cluster.kalix.com
+    imagePullSecrets:
+    - name: default-dockercfg-a51tl
+    nodeName: node1.cluster.kalix.com
+    restartPolicy: Always
+    securityContext: {}
+    serviceAccount: default
+    serviceAccountName: default
+    terminationGracePeriodSeconds: 30
+    volumes:
+    - name: couchdb-volume-1
+      persistentVolumeClaim:
+        claimName: couchdb-claim
+    - name: default-token-9dyvr
+      secret:
+        secretName: default-token-9dyvr
+  status:
+    phase: Pending

@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  creationTimestamp: 2016-07-20T02:20:26Z
+  labels:
+    template: mysql-persistent-template
+  name: couchdb-claim
+  namespace: database
+  resourceVersion: "45869"
+  selfLink: /api/v1/namespaces/database/persistentvolumeclaims/mysql
+  uid: 8550a7d3-4e20-11e6-a9d1-5cf3fcdceffc
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi

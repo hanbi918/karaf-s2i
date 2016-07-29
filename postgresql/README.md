@@ -17,4 +17,8 @@
     deploymentconfig "postgresql" created
     service "postgresql" created
 --> Success
-    Run 'oc status' to view your app.````
+    Run 'oc status' to view your app.````   
+## patch volumn
+````oc volumes dc/postgresql --add --claim-name=couchdbpostgresql --mount-path=/var/lib/postgresql \
+                     -t persistentVolumeClaim --overwrite````
+

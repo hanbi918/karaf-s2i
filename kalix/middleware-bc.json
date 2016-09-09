@@ -1,0 +1,39 @@
+{
+  "apiVersion": "v1",
+  "kind": "BuildConfig",
+  "metadata": {
+    "name": "middleware-parent",
+    "labels": {}
+  },
+  "spec": {
+    "source": {
+      "type": "Git",
+      "sourceSecret": {
+        "name": "jenkins-token-2x2k5"
+      },
+      "git": {
+        "uri": "https://github.com/chenyanxu/middleware-parent.git"
+      }
+    },
+    "strategy": {
+      "type": "Custom",
+      "customStrategy": {
+        "from": {
+          "kind": "DockerImage",
+          "name": "fabric8/openshift-s2i-jenkins-trigger"
+        },
+        "env": [
+          {
+            "name": "BASE_URI"
+          },
+          {
+            "name": "JOB_NAME"
+          }
+        ],
+        "pullSecret": {
+          "name": "jenkins-token-2x2k5"
+        }
+      }
+    }
+  }
+}

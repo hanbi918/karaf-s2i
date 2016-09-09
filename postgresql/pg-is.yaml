@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: ImageStream
+metadata:
+  name: redis
+  namespace: openshift
+  selfLink: /oapi/v1/namespaces/openshift/imagestreams/redis
+  uid: 75a8b7ff-5490-11e6-927d-5cf3fcdceffc
+  resourceVersion: '250231'
+  generation: 1
+  creationTimestamp: '2016-07-28T06:56:50Z'
+spec: {  }
+status:
+  dockerImageRepository: '172.30.93.175:5000/openshift/redis'
+  tags:
+    -
+      tag: latest
+      items:
+        -
+          created: '2016-07-28T06:56:50Z'
+          dockerImageReference: '172.30.93.175:5000/openshift/redis@sha256:bcfab886f27028500361ffd73f9a72188747fd4bf7fe924ef6c13db2d05a0bbc'
+          image: 'sha256:bcfab886f27028500361ffd73f9a72188747fd4bf7fe924ef6c13db2d05a0bbc'
+          generation: 1

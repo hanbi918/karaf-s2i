@@ -2,6 +2,10 @@
 
 本项目是s2i fabric8的克隆源码，可以用来构建s2i的原始镜像，支持java和karaf2个版本。
 
+### create karaf pod
+
+oc new-app --strategy=source fabric8/s2i-karaf~https://github.com/minikiller/framework-project.git -e 'MAVEN_ARGS=mvn clean install karaf:assembly karaf:archive' -e='ARTIFACT_DIR=modules.tools/assembly/target'
+
 This repo holds the source for the fabric8's
 [S2I](https://docs.openshift.com/enterprise/3.0/creating_images/s2i.html)
 builder images for [OpenShift](http://www.openshift.com).

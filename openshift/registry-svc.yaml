@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: 2016-09-08T07:46:05Z
+  labels:
+    docker-registry: default
+  name: docker-registry
+  namespace: default
+  resourceVersion: "1308"
+  selfLink: /api/v1/namespaces/default/services/docker-registry
+  uid: 4c62a48a-7598-11e6-99b4-5cf3fcdceffc
+spec:
+  clusterIP: 172.30.14.164
+  portalIP: 172.30.14.164
+  ports:
+  - name: 5000-tcp
+    port: 5000
+    protocol: TCP
+    targetPort: 5000
+  selector:
+    docker-registry: default
+  sessionAffinity: ClientIP
+  type: ClusterIP
+status:
+  loadBalancer: {}

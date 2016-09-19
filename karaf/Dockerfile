@@ -44,7 +44,9 @@ ADD "http://repo1.maven.org/maven2/org/jolokia/jolokia-jvm/${JOLOKIA_VERSION}/jo
 RUN chmod 444 /opt/jolokia/jolokia.jar \
  && chmod 755 /opt/jolokia/jolokia-opts
 
-EXPOSE 8778 8181 8101
+ENV KARAF_DEBUG true
+
+EXPOSE 8778 8181 8101 5005
 
  
 

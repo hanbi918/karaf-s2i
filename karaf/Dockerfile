@@ -34,6 +34,8 @@ RUN curl "http://www.apache.org/dist/maven/maven-3/${MAVEN_VERSION}/binaries/apa
 # add maven setting
 COPY settings.xml /opt/maven/conf 
 
+# change tiemzone
+RUN cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 
 # Jolokia agent
 ADD jolokia-opts /opt/jolokia/

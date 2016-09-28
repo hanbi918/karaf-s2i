@@ -1,4 +1,8 @@
-#mount nexus
-````oc volumes rc/nexus --add --claim-name=nexus --mount-path=/sonatype-work/storage \
-                     -t persistentVolumeClaim --overwrite````  
-#mount jenkins
+#  mount nexus
+
+```bash
+  oc volumes dc/nexus --add --claim-name=nexus-storage --mount-path=/sonatype-work \
+                     -t persistentVolumeClaim --overwrite
+```  
+
+#  mount jenkins

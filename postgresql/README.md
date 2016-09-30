@@ -34,7 +34,12 @@ oc volumes dc/postgresql --add --claim-name=postgresql --mount-path=/var/lib/pos
                      -t persistentVolumeClaim --overwrite
 ```
 
-## create postgresql backup
+# create postgresql backup
 
 run Dockerfile
+
+```bash
+ docker build -t 172.30.14.164:5000/openshift/pg-backup .
+ docker push 172.30.14.164:5000/openshift/pg-backup
+```
 

@@ -177,7 +177,7 @@
             <repositories>
                 <repository>
                     <id>remote-nexus</id>
-                    <url>http://nexus.apps.kalix.com/content/groups/public/</url>
+                    <url>http://nexus-sunlf.apps.bogon.com/content/groups/public/</url>
                     <snapshots>
                         <enabled>true</enabled>
                     </snapshots>
@@ -190,7 +190,7 @@
                     </snapshots>
                     <id>remote-nexus</id>
                     <name>Maven Plugin Repository</name>
-                    <url>http://nexus.apps.kalix.com/content/groups/public/</url>
+                    <url>http://nexus-sunlf.apps.bogon.com/content/groups/public/</url>
                 </pluginRepository>
             </pluginRepositories>
         </profile>

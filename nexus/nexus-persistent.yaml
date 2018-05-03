@@ -72,10 +72,11 @@ objects:
         description: The Nexus Docker image
         tags: nexus
       from:
-        kind: DockerImage
-        name: openshift/kalix-nexus:latest
+        kind: ImageStreamTag
+        namespace: openshift
+        name: kalix-nexus:latest
       importPolicy: {}
-      name: "kalix-nexus"
+      name: "latest"
 - apiVersion: v1
   kind: DeploymentConfig
   metadata:
@@ -122,7 +123,6 @@ objects:
         - ${NEXUS_SERVICE_NAME}
         from:
           kind: ImageStreamTag
-          namespace: openshift
-          name: kalix-nexus:latest
+          name: nexus:latest
       type: ImageChange
   status: {}

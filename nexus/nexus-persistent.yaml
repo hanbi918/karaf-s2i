@@ -122,6 +122,6 @@ objects:
         - ${NEXUS_SERVICE_NAME}
         from:
           kind: ImageStreamTag
-          name: nexus:2.13.0-01
+          name: nexus:latest
       type: ImageChange
   status: {}

@@ -1,4 +1,4 @@
-FROM sonatype/nexus:2.13.0-01
+FROM sonatype/nexus:2.14.8-01
 
 MAINTAINER Siamak Sadeghianfar <ssadeghi@redhat.com>
 

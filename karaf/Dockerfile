@@ -67,7 +67,9 @@ COPY ./deploy-and-run.sh /deployments/deploy-and-run.sh
 RUN chmod a+x /deployments/deploy-and-run.sh \
  && chmod -R a+rwX /deployments
 
-VOLUME ~/.m2
+RUN mkdir ~/.m2
+
+VOLUME ["~/.m2"]
 
 # S2I requires a numeric, non-0 UID. This is the UID for the jboss user in the base image
 USER 185

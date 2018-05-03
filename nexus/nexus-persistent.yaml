@@ -122,6 +122,7 @@ objects:
         - ${NEXUS_SERVICE_NAME}
         from:
           kind: ImageStreamTag
-          name: nexus:latest
+          namespace: openshift
+          name: kalix-nexus:latest
       type: ImageChange
   status: {}

@@ -99,6 +99,35 @@
             }
         },
         {
+            "kind": "Service",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "konga",
+                "labels": {
+                    "app": "konga"
+                }
+            },
+            "spec": {
+                "ports": [
+                    {
+                        "name": "1337-tcp",
+                        "nodePort": 0,
+                        "protocol": "TCP",
+                        "port": 1337,
+                        "targetPort": 1337
+                    }
+                ],
+                "selector": {
+                    "name": "konga"
+                },
+                "type": "ClusterIP",
+                "sessionAffinity": "None"
+            },
+            "status": {
+                "loadBalancer": {}
+            }
+        },
+        {
             "kind": "Route",
             "apiVersion": "v1",
             "metadata": {
@@ -124,8 +153,33 @@
             }
         },
         {
+            "kind": "Route",
             "apiVersion": "v1",
+            "metadata": {
+                "name": "konga",
+                "labels": {
+                    "app": "konga"
+                },
+                "annotations": {
+                    "openshift.io/host.generated": "true"
+                }
+            },
+            "spec": {
+                "host": "${APPLICATION_HOSTNAME}",
+                "to": {
+                    "kind": "Service",
+                    "name": "konga",
+                    "weight": 100
+                },
+                "port": {
+                    "targetPort": "1337-tcp"
+                },
+                "wildcardPolicy": "None"
+            }
+        },
+        {
             "kind": "ImageStream",
+            "apiVersion": "v1",
             "metadata": {
                 "name": "kong",
                 "labels": {
@@ -158,8 +212,42 @@
             }
         },
         {
-            "apiVersion": "v1",
             "kind": "ImageStream",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "konga",
+                "labels": {
+                    "app": "konga"
+                },
+                "annotations": {
+                    "description": "Keeps track of changes in the application image"
+                }
+            },
+            "spec": {
+                "lookupPolicy": {
+                    "local": false
+                },
+                "tags": [
+                    {
+                        "name": "latest",
+                        "annotations": {
+                            "openshift.io/imported-from": "pantsel/konga"
+                        },
+                        "from": {
+                            "kind": "DockerImage",
+                            "name": "pantsel/konga:latest"
+                        },
+                        "importPolicy": {},
+                        "referencePolicy": {
+                            "type": "Source"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "kind": "ImageStream",
+            "apiVersion": "v1",
             "metadata": {
                 "name": "kong-database",
                 "labels": {
@@ -408,6 +496,74 @@
                                     }
                                 ],
                                 "resources": {},
+                                "terminationMessagePath": "/dev/termination-log",
+                                "terminationMessagePolicy": "File"
+                            }
+                        ],
+                        "dnsPolicy": "ClusterFirst",
+                        "restartPolicy": "Always",
+                        "terminationGracePeriodSeconds": 30,
+                        "securityContext": {}
+                    }
+                },
+                "triggers": [
+                    {
+                        "type": "ConfigChange"
+                    }
+                ]
+            },
+            "status": {}
+        },
+        {
+            "kind": "DeploymentConfig",
+            "apiVersion": "v1",
+            "metadata": {
+                "annotations": {
+                    "template.alpha.openshift.io/wait-for-ready": "true"
+                },
+                "name": "konga"
+            },
+            "spec": {
+                "replicas": 1,
+                "selector": {
+                    "name": "konga",
+                    "deploymentconfig": "konga"
+                },
+                "strategy": {
+                    "type": "Recreate"
+                },
+                "template": {
+                    "metadata": {
+                        "labels": {
+                            "name": "konga",
+                            "deploymentconfig": "konga"
+                        }
+                    },
+                    "spec": {
+                        "volumes": [
+                            {
+                                "name": "konga-volume-1",
+                                "emptyDir": {}
+                            }
+                        ],
+                        "containers": [
+                            {
+                                "name": "konga",
+                                "image": "pantsel/konga",
+                                "imagePullPolicy": "Always",
+                                "ports": [
+                                    {
+                                        "containerPort": 1337,
+                                        "protocol": "TCP"
+                                    }
+                                ],
+                                "resources": {},
+                                "volumeMounts": [
+                                    {
+                                        "name": "konga-volume-1",
+                                        "mountPath": "/app/kongadata"
+                                    }
+                                ],
                                 "terminationMessagePath": "/dev/termination-log",
                                 "terminationMessagePolicy": "File"
                             }

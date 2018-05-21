@@ -1,0 +1,210 @@
+{
+    "kind": "Template",
+    "apiVersion": "v1",
+    "metadata": {
+        "name": "kalix-redis-persistent"
+    },
+    "objects": [
+        {
+            "apiVersion": "v1",
+            "kind": "PersistentVolumeClaim",
+            "metadata": {
+                "name": "redis-claim"
+            },
+            "spec": {
+                "accessModes": [
+                    "ReadWriteOnce"
+                ],
+                "resources": {
+                    "requests": {
+                        "storage": "1Gi"
+                    }
+                }
+            }
+        },
+        {
+            "kind": "Pod",
+            "apiVersion": "v1",
+            "metadata": {
+                "labels": {
+                    "name": "redis",
+                    "redis-sentinel": "true",
+                    "role": "master"
+                },
+                "name": "redis-master"
+            },
+            "spec": {
+                "containers": [
+                    {
+                        "name": "master",
+                        "image": "kubernetes/redis:v1",
+                        "env": [
+                            {
+                                "name": "MASTER",
+                                "value": "true"
+                            }
+                        ],
+                        "ports": [
+                            {
+                                "containerPort": 6379
+                            }
+                        ],
+                        "resources": {
+                            "limits": {
+                                "cpu": "0.1"
+                            }
+                        },
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/redis-master-data",
+                                "name": "redis-claim-data"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "sentinel",
+                        "image": "kubernetes/redis:v1",
+                        "env": [
+                            {
+                                "name": "SENTINEL",
+                                "value": "true"
+                            }
+                        ],
+                        "ports": [
+                            {
+                                "containerPort": 26379
+                            }
+                        ]
+                    }
+                ],
+                "volumes": [
+                    {
+                        "name": "redis-claim-data",
+                        "persistentVolumeClaim": {
+                            "claimName": "redis-claim"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "kind": "Service",
+            "apiVersion": "v1",
+            "metadata": {
+                "labels": {
+                    "name": "sentinel",
+                    "role": "service"
+                },
+                "name": "redis-sentinel"
+            },
+            "spec": {
+                "ports": [
+                    {
+                        "name": "26379port",
+                        "port": 26379,
+                        "targetPort": 26379
+                    }
+                ]
+            },
+            "selector": {
+                "redis-sentinel": "true"
+            }
+        },
+        {
+            "kind": "ReplicationController",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "redis",
+                "labels": {
+                    "name": "redis"
+                }
+            },
+            "spec": {
+                "replicas": 1,
+                "selector": {
+                    "name": "redis"
+                },
+                "template": {
+                    "metadata": {
+                        "labels": {
+                            "name": "redis"
+                        }
+                    },
+                    "spec": {
+                        "containers": [
+                            {
+                                "name": "redis",
+                                "image": "kubernetes/redis:v1",
+                                "ports": [
+                                    {
+                                        "containerPort": 6379
+                                    }
+                                ],
+                                "resources": {
+                                    "limits": {
+                                        "cpu": "0.1"
+                                    }
+                                },
+                                "volumeMounts": [
+                                    {
+                                        "name": "redis-claim-data",
+                                        "mountPath": "/redis-master-data"
+                                    }
+                                ]
+                            }
+                        ],
+                        "volumes": [
+                            {
+                                "name": "redis-claim-data",
+                                "persistentVolumeClaim": {
+                                    "claimName": "redis-claim"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "kind": "ReplicationController",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "redis-sentinel"
+            },
+            "spec": {
+                "replicas": 1,
+                "selector": {
+                    "redis-sentinel": "true"
+                },
+                "template": {
+                    "metadata": {
+                        "labels": {
+                            "name": "redis-sentinel",
+                            "redis-sentinel": "true",
+                            "role": "sentinel"
+                        }
+                    },
+                    "spec": {
+                        "containers": [
+                            {
+                                "name": "sentinel",
+                                "image": "kubernetes/redis:v1",
+                                "env": [
+                                    {
+                                        "name": "SENTINEL",
+                                        "value": "true"
+                                    }
+                                ],
+                                "ports": [
+                                    {
+                                        "containerPort": 26379
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

@@ -1,0 +1,188 @@
+{
+    "kind": "Template",
+    "apiVersion": "v1",
+    "metadata": {
+        "name": "kalix-couchdb-template"
+    },
+    "objects": [
+        {
+            "kind": "DeploymentConfig",
+            "apiVersion": "v1",
+            "metadata": {
+                "annotations": {
+                    "template.alpha.openshift.io/wait-for-ready": "true"
+                },
+                "name": "couchdb"
+            },
+            "spec": {
+                "replicas": 1,
+                "selector": {
+                    "name": "couchdb"
+                },
+                "strategy": {
+                    "type": "Recreate"
+                },
+                "template": {
+                    "metadata": {
+                        "labels": {
+                            "name": "couchdb"
+                        }
+                    },
+                    "spec": {
+                        "containers": [
+                            {
+                                "name": "couchdb",
+                                "image": "klaemo/couchdb",
+                                "imagePullPolicy": "Always",
+                                "ports": [
+                                    {
+                                        "containerPort": 4369,
+                                        "protocol": "TCP"
+                                    },
+                                    {
+                                        "containerPort": 5984,
+                                        "protocol": "TCP"
+                                    },
+                                    {
+                                        "containerPort": 9100,
+                                        "protocol": "TCP"
+                                    }
+                                ],
+                                "resources": {},
+                                "volumeMounts": [
+                                    {
+                                        "name": "couchdb-volume-1",
+                                        "mountPath": "/opt/couchdb/data"
+                                    }
+                                ],
+                                "terminationMessagePath": "/dev/termination-log",
+                                "terminationMessagePolicy": "File"
+                            }
+                        ],
+                        "dnsPolicy": "ClusterFirst",
+                        "restartPolicy": "Always",
+                        "volumes": [
+                            {
+                                "name": "couchdb-volume-1",
+                                "emptyDir": {}
+                            }
+                        ]
+                    }
+                },
+                "triggers": [
+                    {
+                        "type": "ConfigChange"
+                    }
+                ]
+            }
+        },
+        {
+            "kind": "ImageStream",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "couchdb",
+                "labels": {
+                    "app": "couchdb"
+                },
+                "annotations": {
+                    "description": "Keeps track of changes in the application image"
+                }
+            },
+            "spec": {
+                "lookupPolicy": {
+                    "local": false
+                },
+                "tags": [
+                    {
+                        "name": "latest",
+                        "annotations": {
+                            "openshift.io/imported-from": "klaemo/couchdb"
+                        },
+                        "from": {
+                            "kind": "DockerImage",
+                            "name": "klaemo/couchdb:latest"
+                        },
+                        "importPolicy": {},
+                        "referencePolicy": {
+                            "type": "Source"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "kind": "Route",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "couchdb",
+                "labels": {
+                    "app": "couchdb"
+                },
+                "annotations": {
+                    "openshift.io/host.generated": "true"
+                }
+            },
+            "spec": {
+                "host": "${APPLICATION_HOSTNAME}",
+                "to": {
+                    "kind": "Service",
+                    "name": "couchdb",
+                    "weight": 100
+                },
+                "port": {
+                    "targetPort": "5984-tcp"
+                },
+                "wildcardPolicy": "None"
+            }
+        },
+        {
+            "kind": "Service",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "couchdb",
+                "labels": {
+                    "app": "couchdb"
+                }
+            },
+            "spec": {
+                "ports": [
+                    {
+                        "name": "4369-tcp",
+                        "nodePort": 0,
+                        "protocol": "TCP",
+                        "port": 4369,
+                        "targetPort": 4369
+                    },
+                    {
+                        "name": "5984-tcp",
+                        "nodePort": 0,
+                        "protocol": "TCP",
+                        "port": 5984,
+                        "targetPort": 5984
+                    },
+                    {
+                        "name": "9100-tcp",
+                        "nodePort": 0,
+                        "protocol": "TCP",
+                        "port": 9100,
+                        "targetPort": 9100
+                    }
+                ],
+                "selector": {
+                    "name": "couchdb"
+                },
+                "type": "ClusterIP",
+                "sessionAffinity": "None"
+            },
+            "status": {
+                "loadBalancer": {}
+            }
+        }
+    ],
+    "parameters": [
+        {
+            "description": "Custom hostname for service routes.  Leave blank for default hostname, e.g.: <application-name>.<project>.<default-domain-suffix>",
+            "name": "APPLICATION_HOSTNAME"
+        }
+    ]
+}

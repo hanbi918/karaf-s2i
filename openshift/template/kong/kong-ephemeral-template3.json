@@ -467,7 +467,7 @@
                                         "value": "0.0.0.0:8001"
                                     }
                                 ],
-                                "image": "kong",
+                                "image": "kong:0.12.3",
                                 "imagePullPolicy": "Always",
                                 "name": "kong",
                                 "ports": [
@@ -774,7 +774,7 @@
                         "containers": [
                             {
                                 "name": "kong-migration",
-                                "image": "kong",
+                                "image": "kong:0.12.3",
                                 "command": [
                                     "/bin/sh",
                                     "-c",
